@@ -241,7 +241,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
   end
 
-  # TODO: check if these need h2 or are OK with h3
+  # TODO: these all need tests for h3 as well as h2
   defp link_moduledoc_headings(content) do
     link_headings(content, @heading_regex, "module-")
   end
