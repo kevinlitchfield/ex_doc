@@ -233,8 +233,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   defp link_heading(match, _tag, _title, "", _prefix), do: match
   defp link_heading(_match, tag, title, id, prefix) do
-
-
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
       <a href="##{prefix}#{id}" class="hover-link"><i class="icon-link"></i></a>
@@ -243,12 +241,13 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
   end
 
+  # TODO: check if these need h2 or are OK with h3
   defp link_moduledoc_headings(content) do
-    link_headings(content, @h2_regex, "module-")
+    link_headings(content, @heading_regex, "module-")
   end
 
   defp link_detail_headings(content, prefix) do
-    link_headings(content, @h2_regex, prefix <> "-")
+    link_headings(content, @heading_regex, prefix <> "-")
   end
 
   templates = [
