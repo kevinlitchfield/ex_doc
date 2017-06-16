@@ -165,7 +165,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
   test "<h3> tags in method `@doc`s are linked" do
     content = get_module_page([CompiledWithDocs])
-    assert content =~ ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Examples.*</h3>}ms
+    assert content =~ ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<span class="icon-link" aria-hidden="true"></span>.*</a>.*Examples.*</h3>}ms
   end
 
   ## LISTING
