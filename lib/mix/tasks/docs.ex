@@ -72,6 +72,9 @@ defmodule Mix.Tasks.Docs do
     * `:formatters` - Formatter to use; default: ["html"],
       options: "html", "epub".
 
+    * `:language` - Identify the primary language of the documents, its value must be
+      a valid [BCP 47](https://tools.ietf.org/html/bcp47) language tag; default: "en"
+
     * `:logo` - Path to the image logo of the project (only PNG or JPEG accepted)
       The image size will be 64x64. When specified, the logo will be placed under
       the "assets" directory in the output path under the name "logo" and the
@@ -112,7 +115,7 @@ defmodule Mix.Tasks.Docs do
 
     {cli_opts, args, _} = OptionParser.parse(args,
                             aliases: [n: :canonical, f: :formatter, o: :output],
-                            switches: [canonical: :string, formatter: :keep, output: :string])
+                            switches: [canonical: :string, formatter: :keep, language: :string, output: :string])
 
     if args != [] do
       Mix.raise "Extraneous arguments on the command line"
@@ -124,7 +127,8 @@ defmodule Mix.Tasks.Docs do
       config
       |> get_docs_opts()
       |> Keyword.merge(cli_opts)
-      |> normalize_source_url(config)
+      |> normalize_source_url(config)   # accepted at root level config
+      |> normalize_homepage_url(config) # accepted at root level config
       |> normalize_source_beam(config)
       |> normalize_main()
       |> normalize_deps()
@@ -138,7 +142,7 @@ defmodule Mix.Tasks.Docs do
 
   defp get_formatters(options) do
     case Keyword.get_values(options, :formatter) do
-      [] -> options[:formatters] || ["html"]
+      [] -> options[:formatters] || [ExDoc.Config.default(:formatter)]
       values -> values
     end
   end
@@ -160,6 +164,14 @@ defmodule Mix.Tasks.Docs do
   defp normalize_source_url(options, config) do
     if source_url = config[:source_url] do
       Keyword.put(options, :source_url, source_url)
+    else
+      options
+    end
+  end
+
+  defp normalize_homepage_url(options, config) do
+    if homepage_url = config[:homepage_url] do
+      Keyword.put(options, :homepage_url, homepage_url)
     else
       options
     end

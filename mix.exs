@@ -3,7 +3,7 @@ defmodule ExDoc.Mixfile do
 
   def project do
     [app: :ex_doc,
-     version: "0.15.1",
+     version: "0.16.1",
      elixir: "~> 1.3",
      deps: deps(),
      aliases: aliases(),
@@ -34,7 +34,8 @@ defmodule ExDoc.Mixfile do
   defp package do
    [licenses: ["Apache 2.0"],
     maintainers: ["José Valim", "Eksperimental", "Milton Mazzarri", "Friedel Ziegelmayer"],
-    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc"}]
+    links: %{"GitHub" => "https://github.com/elixir-lang/ex_doc",
+             "Writing documentation" => "https://hexdocs.pm/elixir/writing-documentation.html"}]
   end
 
   def escript do

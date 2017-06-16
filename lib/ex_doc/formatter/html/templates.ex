@@ -73,6 +73,16 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
+  Returns the HTML formatted title for the module page.
+  """
+  def module_title(%{type: :task, title: title}),
+    do: "mix " <> title
+  def module_title(%{type: :module, title: title}),
+    do: title
+  def module_title(%{type: type, title: title}),
+    do: title <> " <small>#{type}</small>"
+
+  @doc """
   Gets the first paragraph of the documentation of a node. It strips
   surrounding spaces and strips traling `:` and `.`.
 
@@ -83,7 +93,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
 
   def synopsis(nil), do: nil
   def synopsis(""),  do: ""
-  def synopsis(doc) when is_bitstring(doc) do
+  def synopsis(doc) when is_binary(doc) do
     doc
     |> String.split(~r/\n\s*\n/)
     |> hd()
@@ -143,11 +153,14 @@ defmodule ExDoc.Formatter.HTML.Templates do
     ~s/{"id":"#{id}","title":"#{title}","group":"#{group}","headers":[#{headers}]}/
   end
 
-  @h2_regex  ~r/<h2.*?>(.+)<\/h2>/m
+  @h2_regex ~r/<h2.*?>(.*?)<\/h2>/m
+  @clean_html_regex ~r/<(?:[^>=]|='[^']*'|="[^"]*"|=[^'"][^\s>]*)*>/
   defp extract_headers(content) do
     @h2_regex
     |> Regex.scan(content, capture: :all_but_first)
     |> List.flatten()
+    |> Enum.filter(&(&1 != ""))
+    |> Enum.map(&(String.replace(&1, @clean_html_regex, "")))
     |> Enum.map(&{&1, header_to_id(&1)})
   end
 
@@ -159,9 +172,9 @@ defmodule ExDoc.Formatter.HTML.Templates do
       |> Enum.map_join(",", &sidebar_items_by_type/1)
 
     if items == "" do
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}"}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}"}/
     else
-      ~s/{"id":"#{module_node.id}","title":"#{module_node.id}",#{items}}/
+      ~s/{"id":"#{module_node.id}","title":"#{module_node.title}",#{items}}/
     end
   end
 
@@ -190,6 +203,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp sidebar_type(:extra), do: "extras"
   defp sidebar_type(:module), do: "modules"
   defp sidebar_type(:behaviour), do: "modules"
+  defp sidebar_type(:task), do: "tasks"
 
   def asset_rev(output, pattern) do
     output = Path.expand(output)
@@ -209,7 +223,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   @spec header_to_id(String.t) :: String.t
   def header_to_id(header) do
     header
-    |> String.replace(~r/<.+>/, "")
+    |> String.replace(@clean_html_regex, "")
     |> String.replace(~r/&#\d+;/, "")
     |> String.replace(~r/&[A-Za-z0-9]+;/, "")
     |> String.replace(~r/\W+/u, "-")
@@ -221,7 +235,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   Link headings found with `regex` with in the given `content`. IDs are
   prefixed with `prefix`.
   """
-  @heading_regex ~r/<(h[23]).*?>(.+)<\/\1>/m
+  @heading_regex ~r/<(h[23]).*?>(.*?)<\/\1>/m
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
   def link_headings(content, regex \\ @heading_regex, prefix \\ "")
   def link_headings(nil, _, _), do: nil
@@ -235,7 +249,7 @@ defmodule ExDoc.Formatter.HTML.Templates do
   defp link_heading(_match, tag, title, id, prefix) do
     """
     <#{tag} id="#{prefix}#{id}" class="section-heading">
-      <a href="##{prefix}#{id}" class="hover-link"><i class="icon-link"></i></a>
+      <a href="##{prefix}#{id}" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
       #{title}
     </#{tag}>
     """

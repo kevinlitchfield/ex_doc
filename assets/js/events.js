@@ -16,7 +16,8 @@ var SIDEBAR_TYPES = [
   '#extras-list',
   '#modules-list',
   '#exceptions-list',
-  '#protocols-list'
+  '#protocols-list',
+  '#tasks-list'
 ]
 var SIDEBAR_NAV = $('.sidebar-listNav')
 var CONTENT = $('.content')
@@ -89,6 +90,7 @@ function addEventListeners () {
   SIDEBAR_NAV.on('click', '#modules-list', createHandler('modules'))
   SIDEBAR_NAV.on('click', '#exceptions-list', createHandler('exceptions'))
   SIDEBAR_NAV.on('click', '#protocols-list', createHandler('protocols'))
+  SIDEBAR_NAV.on('click', '#tasks-list', createHandler('tasks'))
 
   $('.sidebar-search input').on('keyup', function (e) {
     if (e.which === 13) { // enter key maps to 13
@@ -98,7 +100,7 @@ function addEventListeners () {
     }
   })
 
-  $('.sidebar-search i.icon-search').on('click', function (e) {
+  $('.sidebar-search .icon-search').on('click', function (e) {
     search()
   })
 }

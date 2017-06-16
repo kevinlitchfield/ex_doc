@@ -1,15 +1,13 @@
-    <%= head_template(config, %{title: module.id, type: module.type}) %>
+    <%= head_template(config, %{title: module.title, type: module.type}) %>
     <%= sidebar_template(config, nodes_map) %>
 
       <h1>
         <small class="visible-xs"><%= config.project %> v<%= config.version %></small>
-        <%= module.id %>
-        <%= if module.type != :module do %>
-          <small><%= module.type %></small>
-        <% end %>
+        <%= module_title(module) %>
         <%= if module.source_url do %>
           <a href="<%= module.source_url %>" title="View Source" class="view-source" rel="help">
-            <i class="icon-code"></i>
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
           </a>
         <% end %>
       </h1>
@@ -24,7 +22,8 @@
         <section id="summary" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#summary">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Summary
           </h1>
@@ -38,7 +37,8 @@
         <section id="types" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#types">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Types
           </h1>
@@ -54,7 +54,8 @@
         <section id="functions" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#functions">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Functions
           </h1>
@@ -68,7 +69,8 @@
         <section id="callbacks" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#callbacks">
-              <i class="icon-link"></i>
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
             </a>
             Callbacks
           </h1>

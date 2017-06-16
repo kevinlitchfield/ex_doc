@@ -9,6 +9,20 @@ defmodule ExDoc do
 
     You can find more details about these options in the `ExDoc.CLI` module.
     """
+
+    @default %{
+      :formatter => "html",
+      :language => "en",
+      :output => "./doc",
+      :retriever => ExDoc.Retriever,
+      :source_ref => "master",
+    }
+
+    @spec default(atom) :: term
+    def default(field) do
+      Map.fetch!(@default, field)
+    end
+
     defstruct [
       assets: nil,
       canonical: nil,
@@ -16,15 +30,17 @@ defmodule ExDoc do
       extra_section: nil,
       extras: [],
       filter_prefix: nil,
-      formatter: "html",
+      formatter: @default.formatter,
       formatter_opts: [],
       homepage_url: nil,
+      language: @default.language,
       logo: nil,
       main: nil,
-      output: "doc",
+      output: @default.output,
       project: nil,
-      retriever: ExDoc.Retriever,
+      retriever: @default.retriever,
       source_beam: nil,
+      source_ref: @default.source_ref,
       source_root: nil,
       source_url: nil,
       source_url_pattern: nil,
@@ -42,12 +58,14 @@ defmodule ExDoc do
        formatter: nil | String.t,
        formatter_opts: Keyword.t,
        homepage_url: nil | String.t,
+       language: String.t,
        logo: nil | Path.t,
        main: nil | String.t,
        output: nil | Path.t,
        project: nil | String.t,
        retriever: :atom,
        source_beam: nil | String.t,
+       source_ref: nil | String.t,
        source_root: nil | String.t,
        source_url: nil | String.t,
        source_url_pattern: nil | String.t,
@@ -114,7 +132,7 @@ defmodule ExDoc do
   # Helpers
 
   defp normalize_options(options) do
-    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || "master")
+    pattern = options[:source_url_pattern] || guess_url(options[:source_url], options[:source_ref] || ExDoc.Config.default(:source_ref))
     options = Keyword.put(options, :source_url_pattern, pattern)
 
     if is_bitstring(options[:output]) do
@@ -124,21 +142,30 @@ defmodule ExDoc do
     end
   end
 
-  defp guess_url(url = <<"https://github.com/", _ :: binary>>, ref) do
-    append_slash(url) <> "blob/#{ref}/%{path}#L%{line}"
+  defp guess_url(url, ref) do
+    with {:ok, host_with_path} <- http_or_https(url),
+         {:ok, pattern} <- known_pattern(host_with_path, ref) do
+      "https://" <> append_slash(host_with_path) <> pattern
+    else
+      _ -> url
+    end
   end
 
-  defp guess_url(url = <<"https://gitlab.com/", _ :: binary>>, ref) do
-    append_slash(url) <> "blob/#{ref}/%{path}#L%{line}"
-  end
+  defp http_or_https("http://" <> rest),
+    do: {:ok, rest}
+  defp http_or_https("https://" <> rest),
+    do: {:ok, rest}
+  defp http_or_https(_),
+    do: :error
 
-  defp guess_url(url = <<"https://bitbucket.org/", _ :: binary>>, ref) do
-    append_slash(url) <> "src/#{ref}/%{path}#cl-%{line}"
-  end
-
-  defp guess_url(other, _) do
-    other
-  end
+  defp known_pattern("github.com/" <> _, ref),
+    do: {:ok, "blob/#{ref}/%{path}#L%{line}"}
+  defp known_pattern("gitlab.com/" <> _, ref),
+    do: {:ok, "blob/#{ref}/%{path}#L%{line}"}
+  defp known_pattern("bitbucket.org/" <> _, ref),
+    do: {:ok, "src/#{ref}/%{path}#cl-%{line}"}
+  defp known_pattern(_host_with_path, _ref),
+    do: :error
 
   defp append_slash(url) do
     if :binary.last(url) == ?/, do: url, else: url <> "/"

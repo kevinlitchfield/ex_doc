@@ -44,10 +44,17 @@ defmodule ExDoc.Formatter.EPUBTest do
     generate_docs_and_unzip doc_config([main: "RandomError"])
 
     content = File.read!("#{output_dir()}/OEBPS/RandomError.xhtml")
-    assert content =~ ~r{<html.*xmlns:epub="http://www.idpf.org/2007/ops">}ms
+    assert content =~ ~r{<html.*lang="en".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
     assert content =~ ~r{<meta charset="utf-8" />}ms
     assert content =~ ~r{<meta name="generator" content="ExDoc v[^"]+" />}
     assert content =~ ~r{<title>RandomError - Elixir v1.0.1</title>}
+  end
+
+  test "run allows to set the primary language of the document" do
+    generate_docs_and_unzip doc_config([main: "RandomError", language: "fr"])
+
+    content = File.read!("#{output_dir()}/OEBPS/RandomError.xhtml")
+    assert content =~ ~r{<html.*lang="fr".*xmlns:epub="http://www.idpf.org/2007/ops">}ms
   end
 
   test "run generates assets with logo" do
@@ -116,6 +123,7 @@ defmodule ExDoc.Formatter.EPUBTest do
     refute content =~ ~r{UndefParent\.Undocumented}ms
     assert content =~ ~r{.*"RandomError\".*}ms
     assert content =~ ~r{.*"CustomProtocol\".*}ms
+    assert content =~ ~r{.*"Mix\.Tasks\.TaskWithDocs\".*}ms
   end
 
   test "run generates the readme file" do
@@ -124,9 +132,9 @@ defmodule ExDoc.Formatter.EPUBTest do
 
     content = File.read!("#{output_dir()}/OEBPS/readme.xhtml")
     assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<a href="RandomError.xhtml"><code>RandomError</code>}
-    assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
-    assert content =~ ~r{<a href="TypesAndSpecs.Sub.xhtml"><code>TypesAndSpecs.Sub</code></a>}
+    assert content =~ ~r{<a href="RandomError.xhtml"><code(\sclass="inline")?>RandomError</code>}
+    assert content =~ ~r{<a href="CustomBehaviourImpl.xhtml#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
+    assert content =~ ~r{<a href="TypesAndSpecs.Sub.xhtml"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
 
     content = File.read!("#{output_dir()}/OEBPS/nav.xhtml")
     assert content =~ ~r{<li><a href="readme.xhtml">README</a></li>}

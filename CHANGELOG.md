@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.16.1
+
+  * Bug fixes
+    * Fix hover icons coloring
+
+## v0.16.0
+
+  * Enhancements
+    * Separate tasks into "Mix Tasks" in sidebar
+    * Add types to the search results
+    * Improve accessibility
+
+  * Bug fixes
+    * Strip nesting HTML tags in h2 headers
+    * Remove the old search results after every new search attempt
+
 ## v0.15.1
 
   * Bug fixes

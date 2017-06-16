@@ -41,17 +41,24 @@ defmodule ExDoc.Formatter.HTMLTest do
   end
 
   test "guess url base on source_url and source_root options" do
-    generate_docs doc_config(source_url: "https://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
+    file_path = "#{output_dir()}/CompiledWithDocs.html"
+    for scheme <- ["http", "https"] do
+      generate_docs doc_config(source_url: "#{scheme}://github.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://github.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
 
-    generate_docs doc_config(source_url: "https://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
+      generate_docs doc_config(source_url: "#{scheme}://gitlab.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://gitlab.com/elixir-lang/ex_doc/blob/master/test/fixtures/compiled_with_docs.ex#L14"
 
-    generate_docs doc_config(source_url: "https://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
-    content = File.read!("#{output_dir()}/CompiledWithDocs.html")
-    assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-14"
+      generate_docs doc_config(source_url: "#{scheme}://bitbucket.org/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "https://bitbucket.org/elixir-lang/ex_doc/src/master/test/fixtures/compiled_with_docs.ex#cl-14"
+
+      generate_docs doc_config(source_url: "#{scheme}://example.com/elixir-lang/ex_doc", source_root: File.cwd!)
+      content = File.read!(file_path)
+      assert content =~ "#{scheme}://example.com/elixir-lang/ex_doc"
+    end
   end
 
   test "find formatter when absolute path to module is given" do
@@ -132,17 +139,18 @@ defmodule ExDoc.Formatter.HTMLTest do
     generate_docs(doc_config())
 
     content = read_wildcard!("#{output_dir()}/dist/sidebar_items-*.js")
-    assert content =~ ~r{"id":"CompiledWithDocs\"}ms
+    assert content =~ ~r{"id":"CompiledWithDocs","title":"CompiledWithDocs"}ms
     assert content =~ ~r("id":"CompiledWithDocs".*"functions":.*"example/2")ms
-    assert content =~ ~r{"id":"CompiledWithDocs\.Nested"}ms
+    assert content =~ ~r{"id":"CompiledWithDocs\.Nested","title":"CompiledWithDocs\.Nested"}ms
 
-    assert content =~ ~r{"id":"UndefParent\.Nested"}ms
+    assert content =~ ~r{"id":"UndefParent\.Nested","title":"UndefParent\.Nested"}ms
     refute content =~ ~r{"id":"UndefParent\.Undocumented"}ms
 
-    assert content =~ ~r{"id":"CustomBehaviourOne"}ms
-    assert content =~ ~r{"id":"CustomBehaviourTwo"}ms
-    assert content =~ ~r{"id":"RandomError"}ms
-    assert content =~ ~r{"id":"CustomProtocol"}ms
+    assert content =~ ~r{"id":"CustomBehaviourOne","title":"CustomBehaviourOne"}ms
+    assert content =~ ~r{"id":"CustomBehaviourTwo","title":"CustomBehaviourTwo"}ms
+    assert content =~ ~r{"id":"RandomError","title":"RandomError"}ms
+    assert content =~ ~r{"id":"CustomProtocol","title":"CustomProtocol"}ms
+    assert content =~ ~r{"id":"Mix\.Tasks\.TaskWithDocs","title":"task_with_docs"}ms
   end
 
   test "run generates empty listing files only with extras" do
@@ -172,22 +180,23 @@ defmodule ExDoc.Formatter.HTMLTest do
     assert content =~ ~r{<a href="CompiledWithDocs.html">CompiledWithDocs</a>}
     assert content =~ ~r{<p>moduledoc</p>}
     assert content =~ ~r{<a href="CompiledWithDocs.Nested.html">CompiledWithDocs.Nested</a>}
+    assert content =~ ~r{<a href="Mix.Tasks.TaskWithDocs.html">task_with_docs</a>}
   end
 
   test "run generates pages" do
-    config = doc_config([main: "README"])
+    config = doc_config([main: "readme"])
     generate_docs(config)
 
     content = File.read!("#{output_dir()}/index.html")
-    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=README.html">}
+    assert content =~ ~r{<meta http-equiv="refresh" content="0; url=readme.html">}
 
     content = File.read!("#{output_dir()}/readme.html")
     assert content =~ ~r{<title>README [^<]*</title>}
-    assert content =~ ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><i class="icon-link"></i></a>.*Header sample.*</h2>}ms
-    assert content =~ ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><i class="icon-link"></i></a>.*more &gt; than.*</h2>}ms
-    assert content =~ ~r{<a href="RandomError.html"><code>RandomError</code>}
-    assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code>CustomBehaviourImpl.hello/1</code>}
-    assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code>TypesAndSpecs.Sub</code></a>}
+    assert content =~ ~r{<h2 id="header-sample" class="section-heading">.*<a href="#header-sample" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*<code(\sclass="inline")?>Header</code> sample.*</h2>}ms
+    assert content =~ ~r{<h2 id="more-than" class="section-heading">.*<a href="#more-than" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>.*more &gt; than.*</h2>}ms
+    assert content =~ ~r{<a href="RandomError.html"><code(\sclass="inline")?>RandomError</code>}
+    assert content =~ ~r{<a href="CustomBehaviourImpl.html#hello/1"><code(\sclass="inline")?>CustomBehaviourImpl.hello/1</code>}
+    assert content =~ ~r{<a href="TypesAndSpecs.Sub.html"><code(\sclass="inline")?>TypesAndSpecs.Sub</code></a>}
   end
 
   test "run generates pages with custom names" do

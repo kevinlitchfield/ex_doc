@@ -1,9 +1,6 @@
-<%= head_template(config, %{title: module.id}) %>
+<%= head_template(config, %{title: module.title}) %>
     <h1 id="content">
-      <%= module.id %>
-      <%= if module.type != :module do %>
-        <small><%= module.type %></small>
-      <% end%>
+      <%= H.module_title(module) %>
     </h1>
 
     <%= if module.doc do %>
@@ -16,7 +13,8 @@
       <section id="summary" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#summary">
-            <i class="icon-link"></i>
+            <span class="icon-link" aria-hidden="true"></span>
+            <span class="sr-only">Anchor for this section</span>
           </a>
           Summary
         </h1>
@@ -30,7 +28,8 @@
       <section id="types" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#types">
-            <i class="icon-link"></i>
+            <span class="icon-link" aria-hidden="true"></span>
+            <span class="sr-only">Anchor for this section</span>
           </a>
           Types
         </h1>
@@ -46,7 +45,8 @@
       <section id="functions" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#functions">
-            <i class="icon-link"></i>
+            <span class="icon-link" aria-hidden="true"></span>
+            <span class="sr-only">Anchor for this section</span>
           </a>
           Functions
         </h1>
@@ -60,7 +60,8 @@
       <section id="callbacks" class="details-list">
         <h1 class="section-heading">
           <a class="hover-link" href="#callbacks">
-            <i class="icon-link"></i>
+            <span class="icon-link" aria-hidden="true"></span>
+            <span class="sr-only">Anchor for this section</span>
           </a>
           Callbacks
         </h1>

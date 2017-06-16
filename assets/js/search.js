@@ -17,6 +17,7 @@ import resultsTemplate from './templates/search-results.handlebars'
 const $content = $('.content-inner')
 const $input = $('.sidebar-search input')
 const $sidebarItems = $('#full-list li')
+var $results
 
 // Local Methods
 // -------------
@@ -50,25 +51,28 @@ function findNested (elements, parentId, matcher) {
 
 export function findIn (elements, matcher) {
   return elements.map(function (element) {
-    var id = element.id
-    var idMatch = id && id.match(matcher)
-    var functionMatches = findNested(element.functions, id, matcher)
-    var macroMatches = findNested(element.macros, id, matcher)
-    var callbackMatches = findNested(element.callbacks, id, matcher)
+    var title = element.title
+    var titleMatch = title && title.match(matcher)
+    var functionMatches = findNested(element.functions, title, matcher)
+    var macroMatches = findNested(element.macros, title, matcher)
+    var callbackMatches = findNested(element.callbacks, title, matcher)
+    var typeMatches = findNested(element.types, title, matcher)
 
     var result = {
       id: element.id,
-      match: idMatch ? highlight(idMatch) : element.id
+      match: titleMatch ? highlight(titleMatch) : element.title
     }
 
     if (functionMatches.length > 0) result.functions = functionMatches
     if (macroMatches.length > 0) result.macros = macroMatches
     if (callbackMatches.length > 0) result.callbacks = callbackMatches
+    if (typeMatches.length > 0) result.types = typeMatches
 
-    if (idMatch ||
+    if (titleMatch ||
         functionMatches.length > 0 ||
         macroMatches.length > 0 ||
-        callbackMatches.length > 0
+        callbackMatches.length > 0 ||
+        typeMatches.length > 0
        ) {
       return result
     }
@@ -83,6 +87,7 @@ function search (nodes, value) {
   var modules = findIn(nodes.modules, safeVal)
   var exceptions = findIn(nodes.exceptions, safeVal)
   var protocols = findIn(nodes.protocols, safeVal)
+  var tasks = findIn(nodes.tasks, safeVal)
 
   if (modules.length > 0) {
     levels.push({
@@ -105,7 +110,18 @@ function search (nodes, value) {
     })
   }
 
-  var $results = $(resultsTemplate({
+  if (tasks.length > 0) {
+    levels.push({
+      name: 'Mix Tasks',
+      results: tasks
+    })
+  }
+
+  if ($results) {
+    $results.remove()
+  }
+
+  $results = $(resultsTemplate({
     value: value,
     levels: levels,
     empty: levels.length === 0
