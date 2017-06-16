@@ -218,8 +218,8 @@ defmodule ExDoc.Formatter.HTML.Templates do
   end
 
   @doc """
-  Link secondary headings found with `regex` with in the given `content`.
-  IDs are prefixed with `prefix`.
+  Link headings found with `regex` with in the given `content`. IDs are
+  prefixed with `prefix`.
   """
   @heading_regex ~r/<(h[23]).*?>(.+)<\/\1>/m
   @spec link_headings(String.t, Regex.t, String.t) :: String.t
@@ -241,7 +241,6 @@ defmodule ExDoc.Formatter.HTML.Templates do
     """
   end
 
-  # TODO: these all need tests for h3 as well as h2
   defp link_moduledoc_headings(content) do
     link_headings(content, @heading_regex, "module-")
   end
