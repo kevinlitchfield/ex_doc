@@ -133,6 +133,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
 
+
+
+    assert content =~ ~r{<h3 id="example-h3-heading" class="section-heading">.*<a href="#example-h3-heading" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example H3 heading.*</h3>}ms
+
+
+
+
     # Summaries
     assert content =~ ~r{example/2.*Some example}ms
     assert content =~ ~r{example_without_docs/0.*<section class="docstring">.*</section>}ms
