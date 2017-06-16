@@ -85,6 +85,11 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
       "Example function: Summary should not display trailing puntuation"
   end
 
+  test "<h3> tags in method doc headers linked" do
+    content = get_module_page([CompiledWithDocs])
+    assert content =~ ~r{<h3 id="example_with_h3/0-examples" class="section-heading">.*<a href="#example_with_h3/0-examples" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Examples.*</h3>}ms
+  end
+
   ## LISTING
 
   test "site title text links to homepage_url when set" do
