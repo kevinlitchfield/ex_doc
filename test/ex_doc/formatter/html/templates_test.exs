@@ -107,6 +107,13 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
 
     <h2></h2>
     """)
+
+    assert Templates.link_headings("<h3>Foo</h3>") == """
+    <h3 id="foo" class="section-heading">
+      <a href="#foo" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+      Foo
+    </h3>
+    """
   end
 
   test "sidebar items from headers" do
