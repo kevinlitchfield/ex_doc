@@ -132,13 +132,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     refute content =~ ~r{<small>module</small>}
     assert content =~ ~r{moduledoc.*Example.*CompiledWithDocs\.example.*}ms
     assert content =~ ~r{<h2 id="module-example-unicode-escaping" class="section-heading">.*<a href="#module-example-unicode-escaping" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example.*</h2>}ms
-
-
-
-    assert content =~ ~r{<h3 id="example-h3-heading" class="section-heading">.*<a href="#example-h3-heading" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example H3 heading.*</h3>}ms
-
-
-
+    assert content =~ ~r{<h3 id="module-example-h3-heading" class="section-heading">.*<a href="#module-example-h3-heading" class="hover-link">.*<i class="icon-link"></i>.*</a>.*Example H3 heading.*</h3>}ms
 
     # Summaries
     assert content =~ ~r{example/2.*Some example}ms
@@ -146,7 +140,7 @@ defmodule ExDoc.Formatter.HTML.TemplatesTest do
     assert content =~ ~r{example_1/0.*<span class="note">\(macro\)</span>}ms
 
     # Source
-    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L10"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
+    assert content =~ ~r{<a href="#{source_url()}/blob/master/test/fixtures/compiled_with_docs.ex#L14"[^>]*>\n\s*<i class="icon-code"></i>\n\s*</a>}ms
 
     # Functions
     assert content =~ ~s{<div class="detail" id="example/2">}
